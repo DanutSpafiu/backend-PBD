@@ -33,7 +33,7 @@ public class Acquisition {
     @Column(name = "produs", nullable = false)
     private String product;
 
-    @NotBlank
+    @NotNull
     @Column(name = "data_achizitie", nullable = false)
     private LocalDate acquisitionDate;
 

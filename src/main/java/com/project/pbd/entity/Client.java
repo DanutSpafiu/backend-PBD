@@ -42,7 +42,7 @@ public class Client {
     private String address;
 
     @NotBlank
-    @Pattern(regexp = "^[0-9]{10}$")
+    @Pattern(regexp = "^[0-9]{9}$")
     @Column(name = "telefon", nullable = false, unique = true, length = 9)
     private String phone;
 
