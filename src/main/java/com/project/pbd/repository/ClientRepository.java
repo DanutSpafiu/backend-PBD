@@ -1,4 +1,8 @@
 package com.project.pbd.repository;
 
-public class ClientRepository {
+import com.project.pbd.entity.Client;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ClientRepository extends JpaRepository<Client, Long> {
+
 }
