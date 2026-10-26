@@ -32,20 +32,15 @@ public class AcquisitionService {
             throw new IllegalArgumentException("Price must be greater than zero");
         }
 
-        if (collectedAmount == null || collectedAmount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Collected amount must be greater than zero");
+        if (collectedAmount == null || collectedAmount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Collected amount must be non-negative");
         }
 
         BigDecimal available = client.getAvailable();
         BigDecimal total = available.add(collectedAmount);
-        BigDecimal difference = total.subtract(price);
-
-        if (difference.compareTo(BigDecimal.ZERO) > 0) {
-            client.setAvailable(difference);
-        } else {
-            client.setAvailable(BigDecimal.ZERO);
-        }
-        createAndSaveAcquisition(client, product, acquisitionDate, price, collectedAmount);
+        BigDecimal paidAmount = total.min(price);
+        client.setAvailable(total.subtract(paidAmount));
+        createAndSaveAcquisition(client, product, acquisitionDate, price, paidAmount);
     }
 
     public void saveAcquisition(Acquisition acquisition) {
