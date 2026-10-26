@@ -1,7 +1,7 @@
 package com.project.pbd.controller;
 
 import com.project.pbd.dto.FulllyPaidAcquisitionDto;
-import com.project.pbd.service.AcquisitionService;
+import com.project.pbd.dto.DetailedAcquisitionDto;
 import com.project.pbd.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +15,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportController {
     private final ReportService reportService;
+
+    @GetMapping("/achizitiiDetalite")
+    public List<DetailedAcquisitionDto> getDetailedAcquisitions() {
+        return reportService.getDetailedAcquisitions();
+    }
 
     @GetMapping("/achizitiAchitate")
     public List<FulllyPaidAcquisitionDto> getFullyPaidAcquisitions() {
