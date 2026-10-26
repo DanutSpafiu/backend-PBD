@@ -7,6 +7,8 @@ import com.project.pbd.repository.ClientRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,7 +28,7 @@ public class AcquisitionService {
     @Transactional
     public void sellProduct(String cnp, String product, LocalDate acquisitionDate, BigDecimal price, BigDecimal collectedAmount) {
         Client client = clientRepository.findByCNP(cnp)
-                .orElseThrow(() -> new IllegalArgumentException("Client not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
 
         if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Price must be greater than zero");
