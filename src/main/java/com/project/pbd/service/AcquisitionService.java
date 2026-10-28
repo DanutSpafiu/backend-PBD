@@ -5,7 +5,7 @@ import com.project.pbd.entity.Client;
 import com.project.pbd.repository.AcquisitionRepository;
 import com.project.pbd.repository.ClientRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AcquisitionService {
 
     private final AcquisitionRepository acquisitionRepository;
@@ -38,11 +38,7 @@ public class AcquisitionService {
             throw new IllegalArgumentException("Collected amount must be non-negative");
         }
 
-        BigDecimal available = client.getAvailable();
-        BigDecimal total = available.add(collectedAmount);
-        BigDecimal paidAmount = total.min(price);
-        client.setAvailable(total.subtract(paidAmount));
-        createAndSaveAcquisition(client, product, acquisitionDate, price, paidAmount);
+        createAndSaveAcquisition(client, product, acquisitionDate, price, collectedAmount);
     }
 
     public void saveAcquisition(Acquisition acquisition) {
