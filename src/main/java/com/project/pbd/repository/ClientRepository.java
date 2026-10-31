@@ -1,13 +1,16 @@
 package com.project.pbd.repository;
 
 import com.project.pbd.entity.Client;
-import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.EntityGraph;
 
 import java.util.Optional;
+import java.util.List;
 
 public interface ClientRepository extends JpaRepository<Client, Long> {
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Override
+    @EntityGraph(attributePaths = "acquisitions")
+    List<Client> findAll();
+
     Optional<Client> findByCNP(String cnp);
 }

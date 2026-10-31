@@ -1,7 +1,6 @@
 package com.project.pbd.service;
 
 import com.project.pbd.entity.Acquisition;
-import com.project.pbd.entity.Client;
 import com.project.pbd.repository.AcquisitionRepository;
 import com.project.pbd.repository.ClientRepository;
 import jakarta.transaction.Transactional;
@@ -27,7 +26,7 @@ public class AcquisitionService {
 
     @Transactional
     public void sellProduct(String cnp, String product, LocalDate acquisitionDate, BigDecimal price, BigDecimal collectedAmount) {
-        Client client = clientRepository.findByCNP(cnp)
+        clientRepository.findByCNP(cnp)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client not found"));
 
         if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
@@ -38,29 +37,7 @@ public class AcquisitionService {
             throw new IllegalArgumentException("Collected amount must be non-negative");
         }
 
-        createAndSaveAcquisition(client, product, acquisitionDate, price, collectedAmount);
-    }
-
-    public void saveAcquisition(Acquisition acquisition) {
-        acquisitionRepository.save(acquisition);
-    }
-
-    private void createAndSaveAcquisition(
-            Client client,
-            String product,
-            LocalDate acquisitionDate,
-            BigDecimal price,
-            BigDecimal collectedAmount) {
-
-        Acquisition acquisition = new Acquisition();
-
-        acquisition.setClient(client);
-        acquisition.setProduct(product);
-        acquisition.setAcquisitionDate(acquisitionDate);
-        acquisition.setPrice(price);
-        acquisition.setCollectedAmount(collectedAmount);
-
-        saveAcquisition(acquisition);
+        acquisitionRepository.sellProduct(cnp, product, acquisitionDate, price, collectedAmount);
     }
 
 }

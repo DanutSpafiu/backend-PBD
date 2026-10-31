@@ -6,6 +6,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +33,8 @@ public class Acquisition {
     private Client client;
 
     @NotBlank
-    @Column(name = "produs", nullable = false)
+    @Size(max = 255)
+    @Column(name = "produs", nullable = false, length = 255)
     private String product;
 
     @NotNull
