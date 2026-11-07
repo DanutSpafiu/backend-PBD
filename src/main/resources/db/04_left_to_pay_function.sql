@@ -20,3 +20,4 @@ EXCEPTION
     WHEN NO_DATA_FOUND THEN
         RAISE_APPLICATION_ERROR(-20003, 'Client not found');
 END;
+/

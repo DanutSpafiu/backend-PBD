@@ -1,5 +1,3 @@
--- Run in the application's Oracle schema before starting the updated backend.
--- The incoming suma_incasata is the new payment; the stored value includes credit.
 CREATE OR REPLACE TRIGGER trg_acquisition_payment
 BEFORE INSERT ON achizitii
 FOR EACH ROW

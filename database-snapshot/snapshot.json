@@ -1,0 +1,124 @@
+﻿[
+    {
+        "kind":  "table",
+        "name":  "CLIENTI",
+        "ddl":  "\n  CREATE TABLE \"CLIENTI\" \n   (\t\"ID\" NUMBER GENERATED ALWAYS AS IDENTITY MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE\tNOKEEP\tNOSCALE  NOT NULL ENABLE, \n\t\"NUME\" VARCHAR2(15) NOT NULL ENABLE, \n\t\"PRENUME\" VARCHAR2(20) NOT NULL ENABLE, \n\t\"CNP\" VARCHAR2(13) NOT NULL ENABLE, \n\t\"ADRESA\" VARCHAR2(255), \n\t\"TELEFON\" VARCHAR2(9) NOT NULL ENABLE, \n\t\"DISPONIBIL\" NUMBER(12,2) DEFAULT 0 NOT NULL ENABLE, \n\t CONSTRAINT \"CK_CLIENTI_CNP\" CHECK (REGEXP_LIKE(CNP, \u0027^[0-9]{13}$\u0027)) ENABLE, \n\t CONSTRAINT \"CK_CLIENTI_TELEFON\" CHECK (REGEXP_LIKE(TELEFON, \u0027^[0-9]{9}$\u0027)) ENABLE, \n\t CONSTRAINT \"CK_CLIENTI_DISPONIBIL\" CHECK (DISPONIBIL \u003e= 0) ENABLE, \n\t CONSTRAINT \"PK_CLIENTI\" PRIMARY KEY (\"ID\")\n  USING INDEX  ENABLE, \n\t CONSTRAINT \"UQ_CLIENTI_CNP\" UNIQUE (\"CNP\")\n  USING INDEX  ENABLE, \n\t CONSTRAINT \"UQ_CLIENTI_TELEFON\" UNIQUE (\"TELEFON\")\n  USING INDEX  ENABLE\n\t ) ;"
+    },
+    {
+        "kind":  "table",
+        "name":  "ACHIZITII",
+        "ddl":  "\n  CREATE TABLE \"ACHIZITII\" \n   (\t\"ID\" NUMBER GENERATED ALWAYS AS IDENTITY MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE  NOKEEP  NOSCALE  NOT NULL ENABLE, \n\t\"CLIENT_ID\" NUMBER NOT NULL ENABLE, \n\t\"PRODUS\" VARCHAR2(255) NOT NULL ENABLE, \n\t\"DATA_ACHIZITIE\" DATE NOT NULL ENABLE, \n\t\"PRET\" NUMBER(12,2) NOT NULL ENABLE, \n\t\"SUMA_INCASATA\" NUMBER(12,2) DEFAULT 0 NOT NULL ENABLE, \n\t CONSTRAINT \"CK_ACHIZITII_PRET\" CHECK (PRET \u003e 0) ENABLE, \n\t CONSTRAINT \"CK_ACHIZITII_INCASATA\" CHECK (SUMA_INCASATA \u003e= 0) ENABLE, \n\t CONSTRAINT \"PK_ACHIZITII\" PRIMARY KEY (\"ID\")\n  USING INDEX  ENABLE, \n\t CONSTRAINT \"FK_ACHIZITII_CLIENTI\" FOREIGN KEY (\"CLIENT_ID\")\n\t\tREFERENCES \"CLIENTI\" (\"ID\") ENABLE\n   ) ;"
+    },
+    {
+        "kind":  "client",
+        "id":  2,
+        "name":  "Ion",
+        "surname":  "Adi",
+        "cnp":  "1234567890123",
+        "address":  "Timis",
+        "phone":  "123456789",
+        "available":  0
+    },
+    {
+        "kind":  "client",
+        "id":  3,
+        "name":  "Achim",
+        "surname":  "Gheorghe",
+        "cnp":  "1234567890124",
+        "address":  "Resita",
+        "phone":  "234567890",
+        "available":  0
+    },
+    {
+        "kind":  "client",
+        "id":  5,
+        "name":  "Dima",
+        "surname":  "Alex",
+        "cnp":  "1234567890125",
+        "address":  "Arad",
+        "phone":  "326774434",
+        "available":  0
+    },
+    {
+        "kind":  "client",
+        "id":  8,
+        "name":  "Duma",
+        "surname":  "Mihai",
+        "cnp":  "1234567890121",
+        "address":  "Deva",
+        "phone":  "576325767",
+        "available":  0
+    },
+    {
+        "kind":  "purchase",
+        "id":  1,
+        "clientId":  2,
+        "product":  "Indesit",
+        "date":  "2007-01-10 00:00:00",
+        "price":  66,
+        "collected":  66
+    },
+    {
+        "kind":  "purchase",
+        "id":  2,
+        "clientId":  3,
+        "product":  "Siemens",
+        "date":  "2003-02-01 00:00:00",
+        "price":  100,
+        "collected":  100
+    },
+    {
+        "kind":  "purchase",
+        "id":  3,
+        "clientId":  3,
+        "product":  "Siemens",
+        "date":  "2003-02-01 00:00:00",
+        "price":  100,
+        "collected":  100
+    },
+    {
+        "kind":  "purchase",
+        "id":  4,
+        "clientId":  5,
+        "product":  "Bosch",
+        "date":  "2005-12-07 00:00:00",
+        "price":  120,
+        "collected":  20
+    },
+    {
+        "kind":  "purchase",
+        "id":  5,
+        "clientId":  8,
+        "product":  "LG",
+        "date":  "2005-12-11 00:00:00",
+        "price":  55,
+        "collected":  37
+    },
+    {
+        "kind":  "purchase",
+        "id":  6,
+        "clientId":  2,
+        "product":  "Sony",
+        "date":  "2006-05-14 00:00:00",
+        "price":  7.99,
+        "collected":  1.99
+    },
+    {
+        "kind":  "object",
+        "name":  "LEFT_TO_PAY",
+        "type":  "FUNCTION",
+        "ddl":  "\n  CREATE OR REPLACE EDITIONABLE FUNCTION \"LEFT_TO_PAY\" (\n\t p_cnp IN clienti.cnp%TYPE,\n\t p_product IN achizitii.produs%TYPE\n) RETURN NUMBER AS\n    v_client_id clienti.id%TYPE;\n    v_count NUMBER;\n    v_remaining NUMBER;\nBEGIN\n    IF p_cnp IS NULL OR TRIM(p_product) IS NULL THEN\n\t      RAISE_APPLICATION_ERROR(-20004, \u0027CNP and product are required\u0027);\n    END IF;\n\t SELECT id INTO v_client_id FROM clienti WHERE cnp = p_cnp;\n\t SELECT COUNT(*), SUM(pret - suma_incasata) INTO v_count, v_remaining\n    FROM achizitii WHERE client_id = v_client_id AND produs = p_product;\n    IF v_count = 0 THEN\n\t  RAISE_APPLICATION_ERROR(-20007, \u0027Product not purchased by client\u0027);\n    END IF;\n\tRETURN v_remaining;\nEXCEPTION\n    WHEN NO_DATA_FOUND THEN\n\t     RAISE_APPLICATION_ERROR(-20003, \u0027Client not found\u0027);\nEND;\n/"
+    },
+    {
+        "kind":  "object",
+        "name":  "SELL_PRODUCT",
+        "type":  "PROCEDURE",
+        "ddl":  "\n  CREATE OR REPLACE EDITIONABLE PROCEDURE \"SELL_PRODUCT\" (\n    p_cnp IN clienti.cnp%TYPE,\n    p_product IN achizitii.produs%TYPE,\n    p_date IN achizitii.data_achizitie%TYPE,\n    p_price IN achizitii.pret%TYPE,\n\t p_collected IN achizitii.suma_incasata%TYPE\n) AS\n\tv_client_id clienti.id%TYPE;\nBEGIN\n\t IF p_cnp IS NULL OR NOT REGEXP_LIKE(p_cnp, \u0027^[0-9]{13}$\u0027) THEN\n\t RAISE_APPLICATION_ERROR(-20004, \u0027CNP must contain 13 digits\u0027);\n    END IF;\n\t  IF TRIM(p_product) IS NULL OR LENGTH(p_product) \u003e 255 OR p_date IS NULL THEN\n\tRAISE_APPLICATION_ERROR(-20005, \u0027Product and acquisition date are required\u0027);\n    END IF;\n\tIF p_price IS NULL OR p_price \u003c= 0 OR p_price \u003c\u003e ROUND(p_price, 2)\n\t   OR p_collected IS NULL OR p_collected \u003c 0 OR p_collected \u003c\u003e ROUND(p_collected, 2) THEN\n\t   RAISE_APPLICATION_ERROR(-20006, \u0027Invalid price or collected amount\u0027);\n    END IF;\n    SELECT id INTO v_client_id FROM clienti WHERE cnp = p_cnp;\n    INSERT INTO achizitii(client_id, produs, data_achizitie, pret, suma_incasata)\n    VALUES (v_client_id, p_product, TRUNC(p_date), p_price, p_collected);\nEXCEPTION\n    WHEN NO_DATA_FOUND THEN\n\t     RAISE_APPLICATION_ERROR(-20003, \u0027Client not found\u0027);\nEND;\n/"
+    },
+    {
+        "kind":  "object",
+        "name":  "TRG_ACQUISITION_PAYMENT",
+        "type":  "TRIGGER",
+        "ddl":  "\n  CREATE OR REPLACE EDITIONABLE TRIGGER \"TRG_ACQUISITION_PAYMENT\" \nBEFORE INSERT ON achizitii\nFOR EACH ROW\nDECLARE\n\t v_available clienti.disponibil%TYPE;\n    v_total NUMBER;\nBEGIN\n    IF :NEW.pret IS NULL OR :NEW.pret \u003c= 0 THEN\n\t    RAISE_APPLICATION_ERROR(-20001, \u0027Price must be greater than zero\u0027);\n    END IF;\n\n    IF :NEW.suma_incasata IS NULL OR :NEW.suma_incasata \u003c 0 THEN\n\t  RAISE_APPLICATION_ERROR(-20002, \u0027Collected amount must be non-negative\u0027);\n\t END IF;\n\n\tSELECT disponibil INTO v_available\n\tFROM clienti\n\t  WHERE id = :NEW.client_id\n\t FOR UPDATE;\n\n    v_total := v_available + :NEW.suma_incasata;\n    :NEW.suma_incasata := LEAST(v_total, :NEW.pret);\n\n    UPDATE clienti\n\t  SET disponibil = v_total - :NEW.suma_incasata\n    WHERE id = :NEW.client_id;\nEXCEPTION\n\tWHEN NO_DATA_FOUND THEN\n\t RAISE_APPLICATION_ERROR(-20003, \u0027Client not found\u0027);\nEND;\n/\nALTER TRIGGER \"TRG_ACQUISITION_PAYMENT\" ENABLE;"
+    }
+]
